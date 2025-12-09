@@ -1,7 +1,12 @@
-import sys, argparse, os
+import sys
+import argparse
+import os
 from PIL import Image
 
-DEFAULT_WIDTH = 50
+DEFAULT_WIDTH = 90
+ASCII_CHARS = "@&#%?=+*;:~-,. "
+# ASCII_CHARS = "@#%?*+;:,. "
+# ASCII_CHARS = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\|()1{}[]?-_+~<>i!lI;:,\"^`\'."
 
 
 def open_image(image_path: str):
@@ -16,6 +21,30 @@ def open_image(image_path: str):
         sys.exit(1)
 
 
+def resize_for_terminal(img: Image.Image, width: int = DEFAULT_WIDTH):
+    w, h = img.size
+    ratio = h / w
+    new_height = int((width * ratio * 0.55)) # 0.55 is the correction factor for rectangular terminal fonts.
+    return img.resize((width, new_height))
+
+
+def to_ascii(img: Image.Image, width: int):
+    img = resize_for_terminal(img, width).convert("LA")
+    pixels = img.getdata()
+    ascii_str = ""
+    n = len(ASCII_CHARS)
+    for i, pixel in enumerate(pixels):
+        l, a = pixel
+        if a == 0:
+            ascii_str += " "
+        else:
+            index = int((l * (n - 1)) / 255)
+            ascii_str += ASCII_CHARS[index]
+        if (i + 1) % width == 0:
+            ascii_str += "\n"
+    return ascii_str
+
+
 def convert_image(img: Image.Image, source_path: str, target_format: str):
     filename_root = os.path.splitext(source_path)[0]
     filename_output = f"{filename_root}.{target_format}"
@@ -25,11 +54,11 @@ def convert_image(img: Image.Image, source_path: str, target_format: str):
             case "jpg" | "jpeg":
                 if img.mode in ("RGBA", "P"):
                     out_img = img.convert("RGB")
-                out_img.save(filename_output, quality=90)
+                out_img.save(filename_output)  # default quality 75
             case "png":
                 out_img.save(filename_output, optimize=True)
             case "webp":
-                out_img.save(filename_output)
+                out_img.save(filename_output)  # default quality 80
             case _:
                 print(f"{target_format.upper} format not supported\n")
                 return None
@@ -44,30 +73,35 @@ def main():
         description="Tool for converting images into various formats and/or ASCII/ANSI characters"
     )
     parser.add_argument(
-        "image_paths", type=str, nargs="+", help="Path of one or more images"
+        "image_paths", type=str, nargs="+", help="path of one or more images"
     )
     # Output formats
-    parser.add_argument(
-        "--jpg", "--jpeg", action="store_true", help="Converts the image to JPG format"
+    conv_group = parser.add_argument_group("conversion formats")
+    conv_group.add_argument(
+        "--jpg", "--jpeg", action="store_true", help="converts the image to JPG format"
     )
-    parser.add_argument(
-        "--png", action="store_true", help="Converts the image to PNG format"
+    conv_group.add_argument(
+        "--png", action="store_true", help="converts the image to PNG format"
     )
-    parser.add_argument(
-        "--webp", action="store_true", help="Converts the image to WebP format"
+    conv_group.add_argument(
+        "--webp", action="store_true", help="converts the image to WebP format"
     )
     # Text art
-    parser.add_argument("--ascii", action="store_true", help="Print ASCII Art version")
-    parser.add_argument(
-        "--ansi", action="store_true", help="Print ANSI Color Art version"
+    art_group = parser.add_argument_group("text Art (ASCII/ANSI)")
+    art_group.add_argument(
+        "--ascii", action="store_true", help="print ASCII Art version"
     )
-    parser.add_argument(
+    art_group.add_argument(
+        "--ansi", action="store_true", help="print ANSI Color Art version"
+    )
+    art_group.add_argument(
         "-w",
         "--width",
         type=int,
         default=DEFAULT_WIDTH,
-        help=f"Output width art (default: {DEFAULT_WIDTH})",
+        help=f"output width art (default: {DEFAULT_WIDTH})",
     )
+
     args = parser.parse_args()
 
     requested_formats = []
@@ -78,16 +112,33 @@ def main():
     if args.webp:
         requested_formats.append("webp")
 
+    requested_art = args.ascii or args.ansi
+
     for filepath in args.image_paths:
         img = open_image(filepath)
         if not img:
             continue
 
+        # stampo text arts (se presenti)
+        if args.ascii:
+            print(f"\n{"="*int((args.width-11)/2)} ASCII ART {"="*int((args.width-11)/2)}\n")
+            print(to_ascii(img, args.width))
+            print(f"{"="*args.width}")
+        if args.ansi:
+            ...  # implementare stampa in ansi
+
+        # converto immagini (se richiesto)
         if requested_formats:
             for fmt in requested_formats:
                 output_file = convert_image(img, filepath, fmt)
                 if output_file:
                     print(f"Saved: {output_file}")  # Implementare calcolo memoria
+
+        # se non è stato esplicitato nulla procedo con la modalità interattiva
+        elif not requested_art:
+            ...  # implementare conversione interattiva con calcolo memoria e scelta immagini convertite
+        else:
+            print("Text Art display only (no files saved).")
 
 
 if __name__ == "__main__":
