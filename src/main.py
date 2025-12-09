@@ -76,7 +76,7 @@ def convert_image(img: Image.Image, source_path: str, target_format: str):
             case "webp":
                 out_img.save(filename_output)  # default quality 80
             case _:
-                print(f"{target_format.upper} format not supported\n")
+                print(f"{target_format.upper()} format not supported\n")
                 return None
         return filename_output
     except (OSError, ValueError) as e:
@@ -135,14 +135,13 @@ def main():
         if not img:
             continue
 
-        # stampo text arts (se presenti)
-        if args.ascii:
+        if args.ascii:  # print ASCII Art
             print(
                 f"\n{"="*int((args.width-11)/2)} ASCII ART {"="*int((args.width-11)/2)}\n"
             )
             print(to_ascii(img, args.width))
             print(f"{"="*args.width}")
-        if args.ansi:
+        if args.ansi:  # print ANSI Art
             print(
                 f"\n{"="*int((args.width-10)/2)} ANSI ART {"="*int((args.width-10)/2)}\n"
             )
