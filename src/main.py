@@ -24,7 +24,9 @@ def open_image(image_path: str):
 def resize_for_terminal(img: Image.Image, width: int = DEFAULT_WIDTH):
     w, h = img.size
     ratio = h / w
-    new_height = int((width * ratio * 0.55)) # 0.55 is the correction factor for rectangular terminal fonts.
+    new_height = int(
+        (width * ratio * 0.55)
+    )  # 0.55 is the correction factor for rectangular terminal fonts.
     return img.resize((width, new_height))
 
 
@@ -43,6 +45,20 @@ def to_ascii(img: Image.Image, width: int):
         if (i + 1) % width == 0:
             ascii_str += "\n"
     return ascii_str
+
+
+def to_ansi(img: Image.Image, width: int):
+    img = resize_for_terminal(img, width).convert("RGB")
+    pixels = img.getdata()
+    ansi_str = ""
+    CHARACTER = "█"
+    for i, pixel in enumerate(pixels):
+        r, g, b = pixel
+        ansi_str += f"\033[38;2;{r};{g};{b}m{CHARACTER}"
+        if (i + 1) % width == 0:
+            ansi_str += "\033[0m\n"  # Resetta colore e vai a capo
+    ansi_str += "\033[0m"  # Reset finale
+    return ansi_str
 
 
 def convert_image(img: Image.Image, source_path: str, target_format: str):
@@ -121,11 +137,17 @@ def main():
 
         # stampo text arts (se presenti)
         if args.ascii:
-            print(f"\n{"="*int((args.width-11)/2)} ASCII ART {"="*int((args.width-11)/2)}\n")
+            print(
+                f"\n{"="*int((args.width-11)/2)} ASCII ART {"="*int((args.width-11)/2)}\n"
+            )
             print(to_ascii(img, args.width))
             print(f"{"="*args.width}")
         if args.ansi:
-            ...  # implementare stampa in ansi
+            print(
+                f"\n{"="*int((args.width-10)/2)} ANSI ART {"="*int((args.width-10)/2)}\n"
+            )
+            print(to_ansi(img, args.width))
+            print(f"{"="*args.width}")
 
         # converto immagini (se richiesto)
         if requested_formats:
