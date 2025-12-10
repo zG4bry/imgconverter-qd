@@ -109,6 +109,7 @@ def convert_image(img: Image.Image, source_path: str, target_format: str):
         return filename_output
     except (OSError, ValueError) as e:
         print(f"Errore: {e}")
+        return None
 
 
 def interactive_mode(img: Image.Image, filepath: str):
@@ -260,6 +261,9 @@ def main():
                 output_file = convert_image(img, filepath, fmt)
                 if output_file:
                     print(f"Saved: {output_file} \t{get_file_size(output_file)}")
+                else:
+                    print("Image not saved")
+                    sys.exit(1)
 
         # if nothing has been specified, I will proceed with the interactive mode
         elif not requested_art:
