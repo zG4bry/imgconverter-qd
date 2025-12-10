@@ -3,6 +3,7 @@ import argparse
 import os
 from PIL import Image
 
+ALL_FORMATS = ["png", "jpg", "webp"]
 DEFAULT_WIDTH = 90
 ASCII_CHARS = "@&#%?=+*;:~-,. "
 # ASCII_CHARS = "@#%?*+;:,. "
@@ -75,13 +76,16 @@ def to_ansi(img: Image.Image, width: int):
     CHARACTER = "█"
     for i, pixel in enumerate(pixels):
         r, g, b = pixel
-        ansi_str += f"\033[38;2;{r};{g};{b}m{CHARACTER}"
+        ansi_str += (
+            f"\033[38;2;{r};{g};{b}m{CHARACTER}"  # add colored CHARACTER to string
+        )
         if (i + 1) % width == 0:
-            ansi_str += "\033[0m\n"  # Resetta colore e vai a capo
-    ansi_str += "\033[0m"  # Reset finale
+            ansi_str += "\033[0m\n"  # color reset and new line
+    ansi_str += "\033[0m"  # color reset
     return ansi_str
 
 
+# Aggiungere controllo dell'estensione iniziale. Se è uguale al formato in cui deve essere convertita annullare.
 def convert_image(img: Image.Image, source_path: str, target_format: str):
     filename_root = os.path.splitext(source_path)[0]
     filename_output = f"{filename_root}.{target_format}"
@@ -102,6 +106,88 @@ def convert_image(img: Image.Image, source_path: str, target_format: str):
         return filename_output
     except (OSError, ValueError) as e:
         print(f"Errore: {e}")
+
+
+def interactive_mode(img: Image.Image, filepath: str):
+    INTERNAL_WIDTH = 22 + len(
+        filepath
+    )  #  INTERACTIVE MODE for:   => 19 characters + 3 spaces
+    separator = "-" * (INTERNAL_WIDTH)
+    print(separator)
+    print(f"INTERACTIVE MODE for: {filepath}")
+    # Original Size: " => 16 characters
+    print(f"Original Size: {get_file_size(filepath):>{INTERNAL_WIDTH-15}}")
+    print(separator)
+
+    # Dictionary to store results: {format: (path, size_string)}
+    generated_files = {}
+
+    # Convert to all available formats and store results
+    print("Generating temporary previews...")
+
+    for fmt in ALL_FORMATS:
+        out_path = convert_image(img, filepath, fmt)
+        if out_path:
+            size = get_file_size(out_path)
+            generated_files[fmt] = (out_path, size)
+        else:
+            print(f"  [Error] Failed to generate {fmt.upper()}.")
+
+    if not generated_files:
+        print("\n[Error] Could not generate any output files.")
+        return
+
+    # Display the comparison table
+    print("\n[Comparison] Generated File Sizes:")
+    print("---------------------------------------")
+    for fmt, (path, size) in generated_files.items():
+        print(f"{fmt.upper():^6} | {size:>10} | {path}")
+    print("---------------------------------------")
+
+    # Prompt the user for action
+    prompt_msg = "Keep formats (e.g., 'jpg png'), 'all', or 'none'? "
+    choice = input(prompt_msg).lower().strip()
+
+    # Normalize choices for parsing (handle 'jpeg' manually if not in ALL_FORMATS)
+    wanted_formats = choice.split()
+
+    if "all" in wanted_formats or choice == "all":
+        print("All generated files kept.")
+        return
+
+    if "none" in wanted_formats or choice == "none" or not wanted_formats:
+        # If the user enters nothing, we assume 'none'
+        print("No files kept. Deleting all generated files...")
+
+        for path, _ in generated_files.values():
+            try:
+                os.remove(path)
+            except OSError as e:
+                print(f"[Warning] Could not delete {path}: {e}")
+        return
+
+    # Process the user's selection and perform deletion
+    kept_formats = []
+
+    # 'jpeg' as an alias for 'jpg'
+    if "jpg" in ALL_FORMATS and "jpeg" in wanted_formats:
+        wanted_formats.remove("jpeg")
+        if "jpg" not in wanted_formats:
+            wanted_formats.append("jpg")
+
+    for fmt, (path, size) in generated_files.items():
+        if fmt in wanted_formats:
+            kept_formats.append(fmt.upper())
+        else:
+            try:
+                os.remove(path)
+            except OSError as e:
+                print(f"[Warning] Could not delete {path}: {e}")
+
+    if kept_formats:
+        print(f"Success! Kept: {", ".join(kept_formats)}")
+    else:
+        print("No files kept. All generated previews deleted.")
 
 
 def main():
@@ -156,29 +242,25 @@ def main():
         if not img:
             continue
 
-        if args.ascii:  # print ASCII Art
-            print(
-                f"\n{"="*int((args.width-11)/2)} ASCII ART {"="*int((args.width-11)/2)}\n"
-            )
+        if args.ascii:  # print ASCII Art (if requested)
+            print(f"\n{" ASCII ART ":-^{args.width}}\n")
             print(to_ascii(img, args.width))
-            print(f"{"="*args.width}")
-        if args.ansi:  # print ANSI Art
-            print(
-                f"\n{"="*int((args.width-10)/2)} ANSI ART {"="*int((args.width-10)/2)}\n"
-            )
+            print(f"{"-"*args.width}")
+        if args.ansi:  # print ANSI Art (if requested)
+            print(f"\n{" ANSI ART ":-^{args.width}}\n")
             print(to_ansi(img, args.width))
-            print(f"{"="*args.width}")
+            print(f"{"-"*args.width}")
 
-        # converto immagini (se richiesto)
+        # convert images (if requested)
         if requested_formats:
             for fmt in requested_formats:
                 output_file = convert_image(img, filepath, fmt)
                 if output_file:
-                    print(f"Saved: {output_file} \t{get_file_size(output_file)}")  # Implementare calcolo memoria
+                    print(f"Saved: {output_file} \t{get_file_size(output_file)}")
 
-        # se non è stato esplicitato nulla procedo con la modalità interattiva
+        # if nothing has been specified, I will proceed with the interactive mode
         elif not requested_art:
-            ...  # implementare conversione interattiva con calcolo memoria e scelta immagini convertite
+            interactive_mode(img, filepath)
         else:
             print("Text Art display only (no files saved).")
 
