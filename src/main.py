@@ -9,6 +9,27 @@ ASCII_CHARS = "@&#%?=+*;:~-,. "
 # ASCII_CHARS = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\|()1{}[]?-_+~<>i!lI;:,\"^`\'."
 
 
+def format_size(size_bytes: int):
+    if size_bytes is None:
+        return None
+    units = ["B", "KB", "MB", "GB"]
+    divisor = 1024
+    size = float(size_bytes)
+
+    for i in range(len(units) - 1):
+        if size < divisor:
+            return f"{size:.2f} {units[i]}"
+        size /= divisor
+    # if it exceeds GB, it remains in GB
+    return f"{size:.2f} {units[-1]}"
+
+
+def get_file_size(filepath: str):
+    if not os.path.exists(filepath):
+        return None
+    return format_size(os.path.getsize(filepath))
+
+
 def open_image(image_path: str):
     try:
         with Image.open(image_path) as img:
@@ -153,7 +174,7 @@ def main():
             for fmt in requested_formats:
                 output_file = convert_image(img, filepath, fmt)
                 if output_file:
-                    print(f"Saved: {output_file}")  # Implementare calcolo memoria
+                    print(f"Saved: {output_file} \t{get_file_size(output_file)}")  # Implementare calcolo memoria
 
         # se non è stato esplicitato nulla procedo con la modalità interattiva
         elif not requested_art:
