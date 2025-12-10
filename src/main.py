@@ -36,10 +36,10 @@ def open_image(image_path: str):
         with Image.open(image_path) as img:
             return img.copy()
     except FileNotFoundError:
-        print(f"Error: File non found'{image_path}'")
+        print(f"Error: File not found'{image_path}'")
         sys.exit(1)
-    except Exception as e:
-        print(f"Error: {e}")
+    except OSError as e:
+        print(f"Error: Unable to process the image {e}")
         sys.exit(1)
 
 
@@ -96,10 +96,13 @@ def convert_image(img: Image.Image, source_path: str, target_format: str):
                 if img.mode in ("RGBA", "P"):
                     out_img = img.convert("RGB")
                 out_img.save(filename_output)  # default quality 75
+                return filename_output
             case "png":
                 out_img.save(filename_output, optimize=True)
+                return filename_output
             case "webp":
                 out_img.save(filename_output)  # default quality 80
+                return filename_output
             case _:
                 print(f"{target_format.upper()} format not supported\n")
                 return None
