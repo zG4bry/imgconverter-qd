@@ -87,26 +87,30 @@ def to_ansi(img: Image.Image, width: int):
 
 
 # Aggiungere controllo dell'estensione iniziale. Se è uguale al formato in cui deve essere convertita annullare.
-def convert_image(img: Image.Image, source_path: str, target_format: str, output_dir: str = None):
+def convert_image(
+    img: Image.Image, source_path: str, target_format: str, output_dir: str = None
+):
     source_ext = os.path.splitext(source_path)[1].lower().lstrip(".")
 
-    normalized_source = 'jpg' if source_ext == 'jpeg' else source_ext
-    normalized_target = 'jpg' if target_format == 'jpeg' else target_format
+    normalized_source = "jpg" if source_ext == "jpeg" else source_ext
+    normalized_target = "jpg" if target_format == "jpeg" else target_format
 
     if normalized_source == normalized_target:
         print(f"Skipping: '{source_path}' is alredy in {target_format.upper()} format.")
         return None
-    
+
     if output_dir:
         os.makedirs(output_dir, exist_ok=True)
-        filename_root = os.path.join(output_dir, os.path.splitext(os.path.basename(source_path))[0])
+        filename_root = os.path.join(
+            output_dir, os.path.splitext(os.path.basename(source_path))[0]
+        )
     else:
         filename_root = os.path.splitext(source_path)[0]
-    
+
     filename_output = f"{filename_root}.{target_format}"
     try:
         out_img = img.copy()
-        
+
         match target_format:
             case "jpg" | "jpeg":
                 # JPG doesn't support transparency
@@ -126,13 +130,13 @@ def convert_image(img: Image.Image, source_path: str, target_format: str, output
         return None
 
 
-def interactive_mode(img: Image.Image, filepath: str):
+def interactive_mode(img: Image.Image, filepath: str, output_dir: str = None):
     INTERNAL_WIDTH = 22 + len(
-        filepath
+        os.path.basename(filepath)
     )  #  INTERACTIVE MODE for:   => 19 characters + 3 spaces
     separator = "-" * (INTERNAL_WIDTH)
-    print(separator)
-    print(f"INTERACTIVE MODE for: {filepath}")
+    print(f"\n{separator}")
+    print(f"INTERACTIVE MODE for: {os.path.basename(filepath)}")
     # Original Size: " => 16 characters
     print(f"Original Size: {get_file_size(filepath):>{INTERNAL_WIDTH-15}}")
     print(separator)
@@ -144,7 +148,7 @@ def interactive_mode(img: Image.Image, filepath: str):
     print("Generating temporary previews...")
 
     for fmt in ALL_FORMATS:
-        out_path = convert_image(img, filepath, fmt)
+        out_path = convert_image(img, filepath, fmt, output_dir)
         if out_path:
             size = get_file_size(out_path)
             generated_files[fmt] = (out_path, size)
@@ -157,54 +161,64 @@ def interactive_mode(img: Image.Image, filepath: str):
 
     # Display the comparison table
     print("\n[Comparison] Generated File Sizes:")
-    print("---------------------------------------")
+    print("-" * 50)
     for fmt, (path, size) in generated_files.items():
-        print(f"{fmt.upper():^6} | {size:>10} | {path}")
-    print("---------------------------------------")
+        display_path = os.path.basename(path) if output_dir else path
+        print(f"{fmt.upper():^6} | {size:>10} | {display_path}")
+    print("-" * 50)
 
-    # Prompt the user for action
-    prompt_msg = "Keep formats (e.g., 'jpg png'), 'all', or 'none'? "
-    choice = input(prompt_msg).lower().strip()
+    # User input
+    print("Which formats do you want to KEEP?")
+    print("- Enter formats separated by spaces (e.g., ‘jpg webp’)")
+    print("- Enter ‘all’ to keep them all")
+    print("- Enter ‘none’ to delete all previews")
+    choice = input("\n> ").lower().strip()
 
-    # Normalize choices for parsing (handle 'jpeg' manually if not in ALL_FORMATS)
+    # Parsing with Regex
     wanted_formats = re.split(r"[;,]\s*|\s+", choice)
+    wanted_formats_normalized = set()
+    for fmt in wanted_formats:
+        if not fmt:
+            continue
+        normalized_fmt = "jpg" if fmt == "jpeg" else fmt
+        if normalized_fmt in generated_files:
+            wanted_formats_normalized.add(normalized_fmt)
+        elif normalized_fmt in ALL_FORMATS:
+            print(
+                f"Note: ‘{fmt.upper()}’ was not generated (it may be the original format)."
+            )
 
-    if "all" in wanted_formats or choice == "all":
+    # At this point, wanted_formats_normalized contains only ‘jpg’, ‘png’, ‘webp’ as unique values.
+
+    files_to_delete = []
+    kept_formats = []
+
+    if "all" in wanted_formats_normalized:
         print("All generated files kept.")
         return
 
-    if "none" in wanted_formats or choice == "none" or not wanted_formats:
+    if "none" in wanted_formats_normalized or not choice:
         # If the user enters nothing, we assume 'none'
+        files_to_delete = list(generated_files.keys())
         print("No files kept. Deleting all generated files...")
+    else:
+        for fmt, _ in generated_files.items():
+            if fmt in wanted_formats_normalized:
+                kept_formats.append(fmt)
+            else:
+                files_to_delete.append(fmt)
 
-        for path, _ in generated_files.values():
-            try:
-                os.remove(path)
-            except OSError as e:
-                print(f"[Warning] Could not delete {path}: {e}")
-        return
-
-    # Process the user's selection and perform deletion
-    kept_formats = []
-
-    # 'jpeg' as an alias for 'jpg'
-    if "jpg" in ALL_FORMATS and "jpeg" in wanted_formats:
-        wanted_formats.remove("jpeg")
-        if "jpg" not in wanted_formats:
-            wanted_formats.append("jpg")
-
-    for fmt, (path, size) in generated_files.items():
-        if fmt in wanted_formats:
-            kept_formats.append(fmt.upper())
-        else:
-            try:
-                os.remove(path)
-            except OSError as e:
-                print(f"[Warning] Could not delete {path}: {e}")
+    # deletion process
+    for fmt in files_to_delete:
+        path_to_remove = generated_files[fmt][0]
+        try:
+            os.remove(path_to_remove)
+        except OSError as e:
+            print(f"[Warning] Could not delete {path_to_remove}: {e}")
 
     if kept_formats:
         print(f"Success! Kept: {", ".join(kept_formats)}")
-    else:
+    elif "none" in wanted_formats:
         print("No files kept. All generated previews deleted.")
 
 
