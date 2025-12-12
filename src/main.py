@@ -96,7 +96,9 @@ def convert_image(
     normalized_target = "jpg" if target_format == "jpeg" else target_format
 
     if normalized_source == normalized_target:
-        print(f"Skipping: '{source_path}' is already in {target_format.upper()} format.")
+        print(
+            f"Skipping: '{source_path}' is already in {target_format.upper()} format."
+        )
         return None
 
     if output_dir:
