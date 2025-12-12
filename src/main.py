@@ -87,23 +87,36 @@ def to_ansi(img: Image.Image, width: int):
 
 
 # Aggiungere controllo dell'estensione iniziale. Se è uguale al formato in cui deve essere convertita annullare.
-def convert_image(img: Image.Image, source_path: str, target_format: str):
-    filename_root = os.path.splitext(source_path)[0]
+def convert_image(img: Image.Image, source_path: str, target_format: str, output_dir: str = None):
+    source_ext = os.path.splitext(source_path)[1].lower().lstrip(".")
+
+    normalized_source = 'jpg' if source_ext == 'jpeg' else source_ext
+    normalized_target = 'jpg' if target_format == 'jpeg' else target_format
+
+    if normalized_source == normalized_target:
+        print(f"Skipping: '{source_path}' is alredy in {target_format.upper()} format.")
+        return None
+    
+    if output_dir:
+        os.makedirs(output_dir, exist_ok=True)
+        filename_root = os.path.join(output_dir, os.path.splitext(os.path.basename(source_path))[0])
+    else:
+        filename_root = os.path.splitext(source_path)[0]
+    
     filename_output = f"{filename_root}.{target_format}"
     try:
         out_img = img.copy()
+        
         match target_format:
             case "jpg" | "jpeg":
+                # JPG doesn't support transparency
                 if img.mode in ("RGBA", "P"):
                     out_img = img.convert("RGB")
                 out_img.save(filename_output)  # default quality 75
-                return filename_output
             case "png":
                 out_img.save(filename_output, optimize=True)
-                return filename_output
             case "webp":
                 out_img.save(filename_output)  # default quality 80
-                return filename_output
             case _:
                 print(f"{target_format.upper()} format not supported\n")
                 return None
@@ -200,9 +213,19 @@ def main():
     parser = argparse.ArgumentParser(
         description="Tool for converting images into various formats and/or ASCII/ANSI characters"
     )
+    # Input
     parser.add_argument(
-        "image_paths", type=str, nargs="+", help="path of one or more images"
+        "image_paths", type=str, nargs="+", help="path of one or more images."
     )
+    # Output dir
+    parser.add_argument(
+        "-o",
+        "--output",
+        type=str,
+        default=None,
+        help="Destination folder for converted files.",
+    )
+
     # Output formats
     conv_group = parser.add_argument_group("conversion formats")
     conv_group.add_argument(
@@ -259,12 +282,11 @@ def main():
         # convert images (if requested)
         if requested_formats:
             for fmt in requested_formats:
-                output_file = convert_image(img, filepath, fmt)
+                output_file = convert_image(img, filepath, fmt, args.output)
                 if output_file:
                     print(f"Saved: {output_file} \t{get_file_size(output_file)}")
                 else:
-                    print("Image not saved")
-                    sys.exit(1)
+                    pass
 
         # if nothing has been specified, I will proceed with the interactive mode
         elif not requested_art:
