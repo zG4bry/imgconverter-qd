@@ -96,7 +96,7 @@ def convert_image(
     normalized_target = "jpg" if target_format == "jpeg" else target_format
 
     if normalized_source == normalized_target:
-        print(f"Skipping: '{source_path}' is alredy in {target_format.upper()} format.")
+        print(f"Skipping: '{source_path}' is already in {target_format.upper()} format.")
         return None
 
     if output_dir:
@@ -128,6 +128,21 @@ def convert_image(
     except (OSError, ValueError) as e:
         print(f"Errore: {e}")
         return None
+
+
+def format_normalizer(raw, files):
+    normalized = set()
+    for fmt in raw:
+        if not fmt:
+            continue
+        normalized_fmt = "jpg" if fmt == "jpeg" else fmt
+        if normalized_fmt in files:
+            normalized.add(normalized_fmt)
+        elif normalized_fmt in ALL_FORMATS:
+            print(
+                f"Note: ‘{fmt.upper()}’ was not generated (it may be the original format)."
+            )
+    return normalized
 
 
 def interactive_mode(img: Image.Image, filepath: str, output_dir: str = None):
@@ -176,17 +191,7 @@ def interactive_mode(img: Image.Image, filepath: str, output_dir: str = None):
 
     # Parsing with Regex
     wanted_formats = re.split(r"[;,]\s*|\s+", choice)
-    wanted_formats_normalized = set()
-    for fmt in wanted_formats:
-        if not fmt:
-            continue
-        normalized_fmt = "jpg" if fmt == "jpeg" else fmt
-        if normalized_fmt in generated_files:
-            wanted_formats_normalized.add(normalized_fmt)
-        elif normalized_fmt in ALL_FORMATS:
-            print(
-                f"Note: ‘{fmt.upper()}’ was not generated (it may be the original format)."
-            )
+    wanted_formats_normalized = format_normalizer(wanted_formats, generated_files)
 
     # At this point, wanted_formats_normalized contains only ‘jpg’, ‘png’, ‘webp’ as unique values.
 
