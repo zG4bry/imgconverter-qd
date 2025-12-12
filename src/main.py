@@ -1,6 +1,7 @@
 import sys
 import argparse
 import os
+import re
 from PIL import Image
 
 ALL_FORMATS = ["png", "jpg", "webp"]
@@ -153,7 +154,7 @@ def interactive_mode(img: Image.Image, filepath: str):
     choice = input(prompt_msg).lower().strip()
 
     # Normalize choices for parsing (handle 'jpeg' manually if not in ALL_FORMATS)
-    wanted_formats = choice.split()
+    wanted_formats = re.split(r"[;,]\s*|\s+", choice)
 
     if "all" in wanted_formats or choice == "all":
         print("All generated files kept.")
