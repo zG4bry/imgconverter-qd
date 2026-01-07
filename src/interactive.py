@@ -1,10 +1,9 @@
 import os
 import re
-from utils import get_file_size
+from utils import get_file_size, format_normalizer
 from consts import ALL_FORMATS
 from convert import convert_image
 from PIL import Image
-from utils import format_normalizer
 
 
 def show_header(filepath: str):
