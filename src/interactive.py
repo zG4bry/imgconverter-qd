@@ -36,7 +36,7 @@ def show_and_create_previews(img: Image.Image, filepath: str, output_dir: str = 
 
     if not generated_files:
         print("\n[Error] Could not generate any output files.")
-        return
+        return []
 
     # Display the comparison table
     print("\n[Comparison] Generated File Sizes:")
