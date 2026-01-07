@@ -1,4 +1,4 @@
-from consts import DEFAULT_WIDTH, ALL_FORMATS
+from consts import DEFAULT_WIDTH
 import argparse
 
 
