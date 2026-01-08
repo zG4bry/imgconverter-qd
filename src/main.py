@@ -25,7 +25,7 @@ def main():
 
         if args.ascii:  # print ASCII Art (if requested)
             print(f"\n{" ASCII ART ":-^{args.width}}\n")
-            print(to_ascii(img, args.width))
+            print(to_ascii(img, args.width, args.color))
             print(f"{"-"*args.width}")
         if args.ansi:  # print ANSI Art (if requested)
             print(f"\n{" ANSI ART ":-^{args.width}}\n")
