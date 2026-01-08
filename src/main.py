@@ -1,11 +1,11 @@
-from arg_parser import args
+from arg_parser import parse_args
 from utils import get_file_size, open_image
 from convert import to_ansi, to_ascii, convert_image
 from interactive import interactive_mode
 
 
 def main():
-
+    parser, args = parse_args()
     requested_formats = []
     if args.jpg:
         requested_formats.append("jpg")
@@ -13,6 +13,8 @@ def main():
         requested_formats.append("png")
     if args.webp:
         requested_formats.append("webp")
+    if args.color and not args.ascii:
+        parser.error("--color/-c can only be used together with --ascii")
 
     requested_art = args.ascii or args.ansi
 
