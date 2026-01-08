@@ -44,7 +44,7 @@ def to_ansi(img: Image.Image, width: int):
     for i, pixel in enumerate(pixels):
         r, g, b, a = pixel
         if a == 0:
-            ansi_str += f"\033[0m "  # print transparent pixel
+            ansi_str += "\033[0m "  # print transparent pixel
         else:
             ansi_str += (
                 f"\033[38;2;{r};{g};{b}m{CHARACTER}"  # add colored CHARACTER to string
