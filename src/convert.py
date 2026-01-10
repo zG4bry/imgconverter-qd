@@ -1,5 +1,5 @@
 from consts import ASCII_CHARS
-from utils import resize_img
+from utils import resize_img, get_source_ext
 from PIL import Image
 import os
 
@@ -59,7 +59,7 @@ def to_ansi(img: Image.Image, width: int):
 def convert_image(
     img: Image.Image, source_path: str, target_format: str, output_dir: str = None
 ):
-    source_ext = os.path.splitext(source_path)[1].lower().lstrip(".")
+    source_ext = get_source_ext(source_path)
 
     normalized_source = "jpg" if source_ext == "jpeg" else source_ext
     normalized_target = "jpg" if target_format == "jpeg" else target_format

@@ -18,6 +18,8 @@ def format_size(size_bytes: int):
     # if it exceeds GB, it remains in GB
     return f"{size:.2f} {units[-1]}"
 
+def get_source_ext(source_path):
+    return os.path.splitext(source_path)[1].lower().lstrip(".")
 
 def get_file_size(filepath: str):
     if not os.path.exists(filepath):
