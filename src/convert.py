@@ -57,7 +57,11 @@ def to_ansi(img: Image.Image, width: int):
 
 # Aggiungere controllo dell'estensione iniziale. Se è uguale al formato in cui deve essere convertita annullare.
 def convert_image(
-    img: Image.Image, source_path: str, target_format: str, output_dir: str = None
+    img: Image.Image,
+    source_path: str,
+    target_format: str,
+    output_dir: str = None,
+    index: int = None,
 ):
     source_ext = get_source_ext(source_path)
 
@@ -77,8 +81,11 @@ def convert_image(
         )
     else:
         filename_root = os.path.splitext(source_path)[0]
-
-    filename_output = f"{filename_root}.{target_format}"
+    is_animated = getattr(img, "is_animated", False)
+    if is_animated and index is not None:
+        filename_output = f"{filename_root}_{index}.{target_format}"
+    else:
+        filename_output = f"{filename_root}.{target_format}"
     try:
         out_img = img.copy()
 

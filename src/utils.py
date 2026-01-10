@@ -18,8 +18,10 @@ def format_size(size_bytes: int):
     # if it exceeds GB, it remains in GB
     return f"{size:.2f} {units[-1]}"
 
+
 def get_source_ext(source_path):
     return os.path.splitext(source_path)[1].lower().lstrip(".")
+
 
 def get_file_size(filepath: str):
     if not os.path.exists(filepath):
@@ -53,8 +55,8 @@ def format_normalizer(raw, files):
 
 def open_image(image_path: str):
     try:
-        with Image.open(image_path) as img:
-            return img.copy()
+        img = Image.open(image_path)
+        return img
     except FileNotFoundError:
         print(f"Error: File not found'{image_path}'")
         sys.exit(1)
