@@ -33,8 +33,8 @@ def resize_img(img: Image.Image, width: int = DEFAULT_WIDTH):
     w, h = img.size
     ratio = h / w
     new_height = int(
-        (width * ratio * 0.55)
-    )  # 0.55 is the correction factor for rectangular terminal fonts.
+        (width * ratio * 0.46)
+    )  # 0.46 is the correction factor for rectangular terminal fonts.
     return img.resize((width, new_height))
 
 
