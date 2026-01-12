@@ -25,7 +25,7 @@ def process_image_file(filepath, args, requested_formats, requested_art):
 
             for text, is_active, art_func in text_arts:
                 if is_active:
-                    print(f"{text} Frame: {frame_index + 1}/{num_frames}")
+                    print(f"\033[0m{text} Frame: {frame_index + 1}/{num_frames}")
                     print(art_func(current_frame, args.width))
                     art_displayed = True
 
