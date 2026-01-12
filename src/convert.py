@@ -1,36 +1,54 @@
 from consts import ASCII_CHARS
-from utils import resize_for_terminal
+from utils import resize_img, get_source_ext
 from PIL import Image
 import os
 
 
-def to_ascii(img: Image.Image, width: int):
-    img = resize_for_terminal(img, width).convert("LA")
+def to_ascii(img: Image.Image, width: int, colored: bool):
+    img = resize_img(img, width)
+    if colored:
+        img = img.convert("RGBA")
+    else:
+        img = img.convert("LA")
     pixels = img.getdata()
     ascii_str = ""
     n = len(ASCII_CHARS)
     for i, pixel in enumerate(pixels):
-        l, a = pixel
-        if a == 0:
-            ascii_str += " "
+        if colored:
+            r, g, b, a = pixel
+            if a == 0:
+                ascii_str += " "
+            else:
+                l = int(0.2126 * r + 0.7152 * g + 0.0722 * b)
+                index = int((l * (n - 1)) / 255)
+                ascii_str += f"\033[38;2;{r};{g};{b}m{ASCII_CHARS[index]}"
+            if (i + 1) % width == 0:
+                ascii_str += "\n"
         else:
-            index = int((l * (n - 1)) / 255)
-            ascii_str += ASCII_CHARS[index]
-        if (i + 1) % width == 0:
-            ascii_str += "\n"
+            l, a = pixel
+            if a == 0:
+                ascii_str += " "
+            else:
+                index = int((l * (n - 1)) / 255)
+                ascii_str += ASCII_CHARS[index]
+            if (i + 1) % width == 0:
+                ascii_str += "\n"
     return ascii_str
 
 
 def to_ansi(img: Image.Image, width: int):
-    img = resize_for_terminal(img, width).convert("RGB")
+    img = resize_img(img, width).convert("RGBA")
     pixels = img.getdata()
     ansi_str = ""
     CHARACTER = "█"
     for i, pixel in enumerate(pixels):
-        r, g, b = pixel
-        ansi_str += (
-            f"\033[38;2;{r};{g};{b}m{CHARACTER}"  # add colored CHARACTER to string
-        )
+        r, g, b, a = pixel
+        if a == 0:
+            ansi_str += "\033[0m "  # print transparent pixel
+        else:
+            ansi_str += (
+                f"\033[38;2;{r};{g};{b}m{CHARACTER}"  # add colored CHARACTER to string
+            )
         if (i + 1) % width == 0:
             ansi_str += "\033[0m\n"  # color reset and new line
     ansi_str += "\033[0m"  # color reset
@@ -39,9 +57,13 @@ def to_ansi(img: Image.Image, width: int):
 
 # Aggiungere controllo dell'estensione iniziale. Se è uguale al formato in cui deve essere convertita annullare.
 def convert_image(
-    img: Image.Image, source_path: str, target_format: str, output_dir: str = None
+    img: Image.Image,
+    source_path: str,
+    target_format: str,
+    output_dir: str = None,
+    index: int = None,
 ):
-    source_ext = os.path.splitext(source_path)[1].lower().lstrip(".")
+    source_ext = get_source_ext(source_path)
 
     normalized_source = "jpg" if source_ext == "jpeg" else source_ext
     normalized_target = "jpg" if target_format == "jpeg" else target_format
@@ -59,8 +81,11 @@ def convert_image(
         )
     else:
         filename_root = os.path.splitext(source_path)[0]
-
-    filename_output = f"{filename_root}.{target_format}"
+    is_animated = getattr(img, "is_animated", False)
+    if is_animated and index is not None:
+        filename_output = f"{filename_root}_{index}.{target_format}"
+    else:
+        filename_output = f"{filename_root}.{target_format}"
     try:
         out_img = img.copy()
 

@@ -19,18 +19,22 @@ def format_size(size_bytes: int):
     return f"{size:.2f} {units[-1]}"
 
 
+def get_source_ext(source_path):
+    return os.path.splitext(source_path)[1].lower().lstrip(".")
+
+
 def get_file_size(filepath: str):
     if not os.path.exists(filepath):
         return None
     return format_size(os.path.getsize(filepath))
 
 
-def resize_for_terminal(img: Image.Image, width: int = DEFAULT_WIDTH):
+def resize_img(img: Image.Image, width: int = DEFAULT_WIDTH):
     w, h = img.size
     ratio = h / w
     new_height = int(
-        (width * ratio * 0.55)
-    )  # 0.55 is the correction factor for rectangular terminal fonts.
+        (width * ratio * 0.46)
+    )  # 0.46 is the correction factor for rectangular terminal fonts.
     return img.resize((width, new_height))
 
 
@@ -51,8 +55,8 @@ def format_normalizer(raw, files):
 
 def open_image(image_path: str):
     try:
-        with Image.open(image_path) as img:
-            return img.copy()
+        img = Image.open(image_path)
+        return img
     except FileNotFoundError:
         print(f"Error: File not found'{image_path}'")
         sys.exit(1)
