@@ -13,7 +13,7 @@
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/your-username/imgconverter-qd.git
+   git clone https://github.com/zG4bry/imgconverter-qd.git
    cd imgconverter-qd
    ```
 
