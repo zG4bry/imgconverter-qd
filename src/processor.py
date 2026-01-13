@@ -37,7 +37,7 @@ def process_image_file(filepath, args, requested_formats, requested_art):
             # convert images (if requested)
             if requested_formats:
                 save_requested_format(
-                    img, filepath, requested_formats, args.output, requested_art
+                    img, filepath, requested_formats, args.output, frame_index
                 )
         # if nothing has been specified, I will proceed with the interactive mode. Only for the first frame
         if not requested_art and not requested_formats:

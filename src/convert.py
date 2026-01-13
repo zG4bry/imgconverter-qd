@@ -55,7 +55,6 @@ def to_ansi(img: Image.Image, width: int):
     return ansi_str
 
 
-# Aggiungere controllo dell'estensione iniziale. Se è uguale al formato in cui deve essere convertita annullare.
 def convert_image(
     img: Image.Image,
     source_path: str,
@@ -104,5 +103,5 @@ def convert_image(
                 return None
         return filename_output
     except (OSError, ValueError) as e:
-        print(f"Errore: {e}")
+        print(f"Error: {e}")
         return None
