@@ -18,5 +18,5 @@ def main():
         print("Text Art display only (no files saved).")
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     main()
