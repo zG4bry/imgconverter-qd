@@ -1,6 +1,5 @@
 import pytest
-from src.utils import format_size
-
+from src.utils import format_size, get_source_ext
 
 @pytest.mark.parametrize("size_bytes, expected_output",
                           [(0, "0.00 B"),
@@ -14,3 +13,11 @@ from src.utils import format_size
 def test_format_size(size_bytes, expected_output):
     result = format_size(size_bytes)
     assert result == expected_output
+
+@pytest.mark.parametrize("source_path, expected_output",
+                         [("/bla/blabla/boh.exe","exe"),
+                          ("/bla/boh.jpg","jpg"),
+                          ("/bla/boh.svg","svg"),
+                          ("/boh.test","test")])
+def test_get_source_ext(source_path, expected_output):
+    assert get_source_ext(source_path) == expected_output
