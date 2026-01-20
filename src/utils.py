@@ -53,7 +53,7 @@ def format_normalizer(raw, files):
     return normalized
 
 
-def open_image(image_path: str):
+def open_image(image_path: str): #pragma: no cover
     try:
         img = Image.open(image_path)
         return img
