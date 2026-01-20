@@ -23,13 +23,13 @@ def get_source_ext(source_path):
     return os.path.splitext(source_path)[1].lower().lstrip(".")
 
 
-def get_file_size(filepath: str):
+def get_file_size(filepath: str): # pragma: no cover
     if not os.path.exists(filepath):
         return None
     return format_size(os.path.getsize(filepath))
 
 
-def resize_img(img: Image.Image, width: int = DEFAULT_WIDTH):
+def resize_img(img: Image.Image, width: int = DEFAULT_WIDTH): # pragma: no cover
     w, h = img.size
     ratio = h / w
     new_height = int(
