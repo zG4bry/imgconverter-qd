@@ -1,7 +1,7 @@
 import os
 import sys
 from PIL import Image
-from consts import DEFAULT_WIDTH, ALL_FORMATS
+from consts import DEFAULT_WIDTH, ALL_FORMATS, CORRECTION_FACTOR
 
 
 def format_size(size_bytes: int):
@@ -33,7 +33,7 @@ def resize_img(img: Image.Image, width: int = DEFAULT_WIDTH):
     w, h = img.size
     ratio = h / w
     new_height = int(
-        (width * ratio * 0.46)
+        (width * ratio * CORRECTION_FACTOR)
     )  # 0.46 is the correction factor for rectangular terminal fonts.
     return img.resize((width, new_height))
 
