@@ -1,5 +1,13 @@
 import pytest
-from src.utils import format_size, get_source_ext, format_normalizer, get_file_size, resize_img, open_image
+from src.utils import (
+    format_size,
+    get_source_ext,
+    format_normalizer,
+    get_file_size,
+    resize_img,
+    open_image,
+)
+from src.consts import CORRECTION_FACTOR
 from PIL import Image
 
 
@@ -50,17 +58,17 @@ def test_format_normalizer(raw_formats, requested_formats, expected_output):
 
 def test_get_file_size_file_not_exists(mocker):
     """Test get_file_size when file doesn't exist"""
-    mocker.patch('os.path.exists', return_value=False)
-    result = get_file_size('/nonexistent/file.jpg')
+    mocker.patch("os.path.exists", return_value=False)
+    result = get_file_size("/nonexistent/file.jpg")
     assert result is None
 
 
 def test_get_file_size_file_exists(mocker):
     """Test get_file_size when file exists"""
     mock_size = 1024
-    mocker.patch('os.path.exists', return_value=True)
-    mocker.patch('os.path.getsize', return_value=mock_size)
-    result = get_file_size('/existing/file.jpg')
+    mocker.patch("os.path.exists", return_value=True)
+    mocker.patch("os.path.getsize", return_value=mock_size)
+    result = get_file_size("/existing/file.jpg")
     assert result == "1.00 KB"
 
 
@@ -68,12 +76,12 @@ def test_resize_img_default_width(mocker):
     """Test resize_img with default width"""
     mock_img = mocker.Mock(spec=Image.Image)
     mock_img.size = (100, 200)
-    
+
     mock_resized = mocker.Mock(spec=Image.Image)
     mock_img.resize.return_value = mock_resized
-    
+
     result = resize_img(mock_img)
-    expected_height = int(90 * (200/100) * 0.46)  # 82
+    expected_height = int(90 * (200 / 100) * CORRECTION_FACTOR)  # 82
     mock_img.resize.assert_called_once_with((90, expected_height))
     assert result == mock_resized
 
@@ -82,41 +90,41 @@ def test_resize_img_custom_width(mocker):
     """Test resize_img with custom width"""
     mock_img = mocker.Mock(spec=Image.Image)
     mock_img.size = (200, 400)
-    
+
     mock_resized = mocker.Mock(spec=Image.Image)
     mock_img.resize.return_value = mock_resized
-    
+
     result = resize_img(mock_img, width=150)
-    expected_height = int(150 * (400/200) * 0.46)  # 138
+    expected_height = int(150 * (400 / 200) * CORRECTION_FACTOR)  # 138
     mock_img.resize.assert_called_once_with((150, expected_height))
     assert result == mock_resized
 
 
 def test_open_image_file_not_found(mocker):
     """Test open_image when file doesn't exist"""
-    mocker.patch('PIL.Image.open', side_effect=FileNotFoundError())
-    
+    mocker.patch("PIL.Image.open", side_effect=FileNotFoundError())
+
     with pytest.raises(SystemExit) as exc_info:
-        open_image('/nonexistent/image.jpg')
+        open_image("/nonexistent/image.jpg")
     assert exc_info.value.code == 1
 
 
 def test_open_image_os_error(mocker):
     """Test open_image when there's an OS error"""
-    mocker.patch('PIL.Image.open', side_effect=OSError("Corrupt image"))
-    
+    mocker.patch("PIL.Image.open", side_effect=OSError("Corrupt image"))
+
     with pytest.raises(SystemExit) as exc_info:
-        open_image('/corrupt/image.jpg')
+        open_image("/corrupt/image.jpg")
     assert exc_info.value.code == 1
 
 
 def test_open_image_success(mocker):
     """Test open_image successful opening"""
     mock_img = mocker.Mock(spec=Image.Image)
-    mock_open = mocker.patch('PIL.Image.open', return_value=mock_img)
-    
-    result = open_image('/valid/image.jpg')
-    mock_open.assert_called_once_with('/valid/image.jpg')
+    mock_open = mocker.patch("PIL.Image.open", return_value=mock_img)
+
+    result = open_image("/valid/image.jpg")
+    mock_open.assert_called_once_with("/valid/image.jpg")
     assert result == mock_img
 
 
