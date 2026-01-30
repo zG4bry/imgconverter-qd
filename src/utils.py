@@ -39,12 +39,26 @@ def resize_img(img: Image.Image, width: int = DEFAULT_WIDTH):
 
 
 def format_normalizer(raw, files):
+    """Normalize requested formats (case-insensitive) and validate against generated files.
+
+    - Skips falsy values (None, empty strings).
+    - Trims whitespace and lowercases inputs.
+    - Treats 'jpeg' as 'jpg'.
+    - `files` can be any iterable (dict, set, list); membership checks keys for dicts.
+    """
     normalized = set()
-    for fmt in raw:
+    # collect file-format keys in lowercase for reliable membership checks
+    files_keys = {str(k).lower() for k in files}
+    for item in raw:
+        # ignore non-string values
+        if not isinstance(item, str):
+            continue
+        # normalize case and trim whitespace
+        fmt = item.strip().lower()
         if not fmt:
             continue
         normalized_fmt = "jpg" if fmt == "jpeg" else fmt
-        if normalized_fmt in files:
+        if normalized_fmt in files_keys:
             normalized.add(normalized_fmt)
         elif normalized_fmt in ALL_FORMATS:
             print(
