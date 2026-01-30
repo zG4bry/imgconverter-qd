@@ -150,9 +150,6 @@ def test_open_image_success(mocker):
     assert result == mock_img
 
 
-
-
-
 def test_format_normalizer_with_duplicates():
     """Test format_normalizer with duplicate formats"""
     raw_formats = ["jpg", "jpeg", "jpg", "png", "png"]
@@ -169,16 +166,16 @@ def test_format_normalizer_with_empty_strings():
     assert result == {"jpg", "png"}
 
 
-def test_format_normalizer_uppercase_formats(mocker):
-    """Test format_normalizer with uppercase formats"""
+def test_format_normalizer_uppercase_formats():
+    """Test format_normalizer with uppercase formats (case-insensitive)"""
     raw_formats = ["JPG", "JPEG", "PNG"]
     requested_formats = ["jpg", "png"]
     result = format_normalizer(raw_formats, requested_formats)
-    # The function uses the formats as-is for comparison, so case-sensitive
-    assert result == set()  # No matches due to case sensitivity
+    # The function is case-insensitive so uppercase inputs should match
+    assert result == {"jpg", "png"}  # Uppercase inputs should be normalized and matched
 
 
-def test_format_normalizer_nonexistent_formats(mocker, capsys):
+def test_format_normalizer_nonexistent_formats():
     """Test format_normalizer with formats not in ALL_FORMATS"""
     raw_formats = ["gif", "bmp"]
     requested_formats = ["gif", "bmp"]
