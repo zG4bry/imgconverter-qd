@@ -1,6 +1,7 @@
 import pytest
 from src.utils import format_size
 
+
 @pytest.mark.parametrize(
     "size_bytes, expected_output",
     [
