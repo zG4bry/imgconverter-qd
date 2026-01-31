@@ -1,5 +1,5 @@
-import pytest
 from src.utils import get_file_size
+
 
 def test_get_file_size_file_not_exists(mocker):
     """Test get_file_size when file doesn't exist"""

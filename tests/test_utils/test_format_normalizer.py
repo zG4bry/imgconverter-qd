@@ -15,6 +15,7 @@ from src.utils import format_normalizer
 def test_format_normalizer(raw_formats, requested_formats, expected_output):
     assert format_normalizer(raw_formats, requested_formats) == expected_output
 
+
 def test_format_normalizer_with_duplicates():
     """Test format_normalizer with duplicate formats"""
     raw_formats = ["jpg", "jpeg", "jpg", "png", "png"]

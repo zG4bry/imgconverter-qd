@@ -1,10 +1,12 @@
 # tests/helpers_ascii.py
 from src.consts import ASCII_CHARS
 
+
 def ascii_for_luminance(l: int) -> str:
     n = len(ASCII_CHARS)
     index = int((l * (n - 1)) / 255)
     return ASCII_CHARS[index]
+
 
 def pixel_to_ascii(pixel, colored=True):
     # pixel is (r,g,b,a)
@@ -17,6 +19,7 @@ def pixel_to_ascii(pixel, colored=True):
         return f"\033[38;2;{r};{g};{b}m{char}"
     else:
         return char
+
 
 def build_expected(pixels, width, colored=True):
     out = ""

@@ -2,17 +2,18 @@ name: CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [main]
     paths-ignore:
       - "README.md"
   pull_request:
-    branches: [ "main" ]
+    branches: [main]
     paths-ignore:
       - "README.md"
 
 jobs:
-  lint:
-    runs-on: ubuntu-24.04
+  test:
+    runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v6
       
@@ -27,9 +28,5 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           if [ -f requirements_dev.txt ]; then pip install -r requirements_dev.txt; fi
 
-      - name: Lint with pylint
-        run: pylint $(git ls-files '*.py') --ignore-paths "^tests/.*$"
-
-      - name: Check code formatting with black
-        run: black --check --diff $(git ls-files '*.py')
-
+      - name: Test with pytest
+        run: pytest --cov src tests/
