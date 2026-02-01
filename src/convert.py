@@ -1,4 +1,4 @@
-from .consts import ASCII_CHARS
+from .consts import ASCII_CHARS, CHARACTER
 from .utils import resize_img, get_source_ext
 from PIL import Image
 import os
@@ -40,7 +40,6 @@ def to_ansi(img: Image.Image, width: int):
     img = resize_img(img, width).convert("RGBA")
     pixels = img.getdata()
     ansi_str = ""
-    CHARACTER = "█"
     for i, pixel in enumerate(pixels):
         r, g, b, a = pixel
         if a == 0:
