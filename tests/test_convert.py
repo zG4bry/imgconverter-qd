@@ -1,6 +1,5 @@
 import pytest
 import os
-from PIL import Image
 from utils import open_image, get_source_ext
 from src.convert import convert_image
 
@@ -22,15 +21,15 @@ def test_convert_image(source_path, target_format, output_dir, capsys):
             output = convert_image(
                 img, source_path, target_format, output_dir, index=None
             )
-            assert output == None
+            assert output is None
             return
-        except:
+        except Exception:
             assert False
 
     try:
         img = open_image(source_path)
         output = convert_image(img, source_path, target_format, output_dir, index=None)
-        if output == None:
+        if output is None:
             captured = capsys.readouterr()
             assert captured.out in [
                 f"Skipping: '{source_path}' is already in {target_format.upper()} format.\n",
@@ -39,5 +38,5 @@ def test_convert_image(source_path, target_format, output_dir, capsys):
         else:
             assert os.path.isfile(output)
             os.remove(output)
-    except:
+    except Exception:
         assert False
