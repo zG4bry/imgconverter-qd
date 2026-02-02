@@ -100,7 +100,7 @@ def convert_image(
             case "webp":
                 out_img.save(filename_output)  # default quality 80
             case _:
-                print(f"{target_format.upper()} format not supported\n")
+                print(f"{target_format.upper()} format not supported")
                 return None
         return filename_output
     except (OSError, ValueError) as e:
