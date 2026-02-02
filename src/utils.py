@@ -58,7 +58,7 @@ def open_image(image_path: str):  # pragma: no cover
         img = Image.open(image_path)
         return img
     except FileNotFoundError:
-        print(f"Error: File not found'{image_path}'")
+        print(f"Error: File not found '{image_path}'")
         sys.exit(1)
     except OSError as e:
         print(f"Error: Unable to process the image {e}")
