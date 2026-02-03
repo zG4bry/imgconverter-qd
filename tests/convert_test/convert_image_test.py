@@ -88,7 +88,7 @@ def test_convert_image_os_error(tmp_path, capsys, mocker):
 
     assert result is None
     captured = capsys.readouterr()
-    assert "Errore:" in captured.out
+    assert "Error:" in captured.out
 
 
 def test_convert_image_value_error(tmp_path, capsys, mocker):
@@ -101,7 +101,7 @@ def test_convert_image_value_error(tmp_path, capsys, mocker):
 
     assert result is None
     captured = capsys.readouterr()
-    assert "Errore:" in captured.out
+    assert "Error:" in captured.out
 
 
 @pytest.mark.parametrize(
