@@ -17,7 +17,7 @@ def mock_open_image(mocker):
 @pytest.fixture()
 def mock_convert_image(mocker):
     """Fixture to mock convert_image function"""
-    return mocker.patch("src.interactive.convert_image")
+    return mocker.patch("src.processor.convert_image")
 
 
 @pytest.fixture()

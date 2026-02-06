@@ -1,12 +1,33 @@
 import os
-from src.processor import process_image_file
+from src.processor import save_requested_format
 
-
-def test_process_image_file_no_img(mock_img, mock_open_image):
+def test_save_requested_format_no_output(mock_convert_image,mock_img, capsys):
+    mock_convert_image.return_value = None
+    img = mock_img
     filename = os.path.basename("show_header_test.py")
-    args = "test"
-    requested_formats = "test_format"
-    requested_art = "test_art"
-    mock_open_image.return_value = None
+    formats = ["test_formats_1","test_formats_2"]
+    output_dir = "test_output_dir"
+    frame_index = 2
 
-    assert process_image_file(filename, args, requested_formats, requested_art) == None
+    save_requested_format(img, filename, formats, output_dir, frame_index)
+
+    captured = capsys.readouterr().out
+
+    assert captured == ""
+    assert mock_convert_image.call_count == len(formats)
+
+
+def test_save_requested_format_success(mock_convert_image,mock_img, capsys):
+    mock_convert_image.return_value = "test_output_file"
+    img = mock_img
+    filename = os.path.basename("show_header_test.py")
+    formats = ["test_formats_1","test_formats_2"]
+    output_dir = "test_output__dir"
+    frame_index = 2
+
+    save_requested_format(img, filename, formats, output_dir, frame_index)
+
+    captured = capsys.readouterr().out
+
+    assert f"Saved:" in captured
+    assert mock_convert_image.call_count == len(formats)
