@@ -1,7 +1,7 @@
 import time
-from .utils import open_image, get_file_size
-from .convert import to_ansi, to_ascii, convert_image
-from .interactive import interactive_mode
+from utils import open_image, get_file_size
+from convert import to_ansi, to_ascii, convert_image
+from interactive import interactive_mode
 
 
 def process_image_file(filepath, args, requested_formats, requested_art):

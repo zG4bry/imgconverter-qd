@@ -1,8 +1,8 @@
 import os
 import re
-from .utils import get_file_size, format_normalizer
-from .consts import ALL_FORMATS
-from .convert import convert_image
+from utils import get_file_size, format_normalizer
+from consts import ALL_FORMATS
+from convert import convert_image
 from PIL import Image
 
 

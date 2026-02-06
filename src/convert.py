@@ -1,5 +1,5 @@
-from .consts import ASCII_CHARS, CHARACTER
-from .utils import resize_img, get_source_ext
+from consts import ASCII_CHARS, CHARACTER
+from utils import resize_img, get_source_ext
 from PIL import Image
 import os
 
