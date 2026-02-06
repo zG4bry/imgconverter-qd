@@ -17,11 +17,6 @@ def mock_generated_files_ok():
     }
 
 
-@pytest.fixture
-def mock_generated_files_empty():
-    return []
-
-
 @pytest.fixture()
 def mock_get_file_size(mocker):
     """Fixture to mock get_file_size function"""
