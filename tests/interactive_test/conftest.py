@@ -51,3 +51,9 @@ def mock_os_remove(mocker):
 def mock_show_and_create_previews(mocker):
     """Fixture to mock show_and_create_previews function"""
     return mocker.patch("src.interactive.show_and_create_previews")
+
+
+@pytest.fixture
+def mock_input(mocker):
+    """Fixture to mock input function"""
+    return mocker.patch("src.interactive.input")

@@ -69,12 +69,13 @@ def test_process_image_file_ascii_animated(
 
     img.close.assert_called_once()
 
+
 def test_process_image_file_no_ascii_no_formats(
     mock_open_image,
     mock_to_ascii,
     mock_save_requested_format,
     mock_time_sleep,
-    mock_interactive_mode
+    mock_interactive_mode,
 ):
     args = Mock()
     args.ascii = False

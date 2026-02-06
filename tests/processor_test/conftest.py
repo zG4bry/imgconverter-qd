@@ -21,12 +21,6 @@ def mock_convert_image(mocker):
 
 
 @pytest.fixture()
-def mock_getattr(mocker):
-    """Fixture to mock getattr function"""
-    return mocker.patch("src.processor.getattr")
-
-
-@pytest.fixture()
 def mock_time_sleep(mocker):
     """Fixture to mock time.sleep function"""
     return mocker.patch("src.processor.time.sleep")
@@ -42,6 +36,7 @@ def mock_save_requested_format(mocker):
 def mock_to_ascii(mocker):
     """Fixture to mock to_ascii function"""
     return mocker.patch("src.processor.to_ascii")
+
 
 @pytest.fixture()
 def mock_interactive_mode(mocker):

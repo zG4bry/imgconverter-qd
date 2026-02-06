@@ -113,21 +113,23 @@ def test_convert_image_value_error(tmp_path, capsys, mocker):
         (False, None, ""),  # Entrambe condizioni false: filename senza index
     ],
 )
-def test_convert_image_animated_with_index(tmp_path, mocker, is_animated, index, expected_suffix):
+def test_convert_image_animated_with_index(
+    tmp_path, mocker, is_animated, index, expected_suffix
+):
     """Test specifico per il caso is_animated + index.
-    
+
     Verifica che il filename includa l'index solo quando is_animated=True E index is not None.
     """
     img = Image.new("RGB", (100, 100), color="red")
-    
+
     # Mock dell'attributo is_animated
     mocker.patch.object(img, "is_animated", is_animated, create=True)
-    
+
     source_path = str(tmp_path / "test.gif")
     target_format = "png"
-    
+
     result = convert_image(img, source_path, target_format, None, index)
-    
+
     assert result is not None
     expected_filename = f"test{expected_suffix}.png"
     assert os.path.basename(result) == expected_filename

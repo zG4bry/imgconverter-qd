@@ -2,6 +2,7 @@ from src.consts import ASCII_CHARS, CHARACTER
 
 # ASCII HELPERS
 
+
 def ascii_for_luminance(l: int) -> str:
     n = len(ASCII_CHARS)
     index = int((l * (n - 1)) / 255)
@@ -34,7 +35,9 @@ def rgba_to_la(pixels):
     """Converte una lista di pixel RGBA in LA (luminance, alpha)"""
     return [(int(0.2126 * r + 0.7152 * g + 0.0722 * b), a) for r, g, b, a in pixels]
 
+
 # ANSI HELPERS
+
 
 def pixel_to_ansi(pixel):
     # pixel is (r,g,b,a)
