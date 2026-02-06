@@ -51,9 +51,3 @@ def mock_os_remove(mocker):
 def mock_show_and_create_previews(mocker):
     """Fixture to mock show_and_create_previews function"""
     return mocker.patch("src.interactive.show_and_create_previews")
-
-
-@pytest.fixture
-def mock_format_normalizer(mocker):
-    """Fixture to mock format_normalizer function"""
-    return mocker.patch("src.interactive.format_normalizer")
