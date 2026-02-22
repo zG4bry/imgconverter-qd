@@ -7,7 +7,7 @@ output_dir = os.path.basename("./")
 
 
 def test_show_and_create_previews_full_success(
-    mock_img, mock_convert_image, mock_get_file_size, capsys
+    mock_img, mock_convert_image, mock_get_file_size
 ):
 
     mock_get_file_size.return_value = "test KB"
@@ -22,7 +22,7 @@ def test_show_and_create_previews_full_success(
 
 
 def test_show_and_create_previews_one_fail(
-    mock_img, mock_convert_image, mock_get_file_size, capsys
+    mock_img, mock_convert_image, mock_get_file_size
 ):
 
     mock_get_file_size.return_value = "test KB"
@@ -43,7 +43,7 @@ def test_show_and_create_previews_one_fail(
     assert expected_output == result
 
 
-def test_show_and_create_previews_fail(mock_img, mock_convert_image, capsys):
+def test_show_and_create_previews_fail(mock_img, mock_convert_image):
     mock_convert_image.return_value = None
     show_and_create_previews(mock_img, filename, output_dir)
 

@@ -2,7 +2,7 @@ import os
 from src.interactive import show_header
 
 
-def test_show_header_outputs_expected_format(mock_get_file_size, capsys, mocker):
+def test_show_header_outputs_expected_format(mock_get_file_size, capsys):
 
     filename = os.path.basename("show_header_test.py")
     internal_width = 22 + len(os.path.basename(filename))
