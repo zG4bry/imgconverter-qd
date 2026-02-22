@@ -1,7 +1,7 @@
 import os
 import sys
 from PIL import Image
-from consts import DEFAULT_WIDTH, ALL_FORMATS, CORRECTION_FACTOR
+from src.consts import DEFAULT_WIDTH, ALL_FORMATS, CORRECTION_FACTOR
 
 
 def format_size(size_bytes: int):
