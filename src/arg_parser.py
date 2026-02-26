@@ -1,4 +1,4 @@
-from consts import DEFAULT_WIDTH
+from src.consts import DEFAULT_WIDTH
 import argparse
 
 

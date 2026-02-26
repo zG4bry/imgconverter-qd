@@ -1,7 +1,7 @@
 import os
 import sys
 from PIL import Image
-from consts import DEFAULT_WIDTH, ALL_FORMATS
+from src.consts import DEFAULT_WIDTH, ALL_FORMATS, CORRECTION_FACTOR
 
 
 def format_size(size_bytes: int):
@@ -33,18 +33,32 @@ def resize_img(img: Image.Image, width: int = DEFAULT_WIDTH):
     w, h = img.size
     ratio = h / w
     new_height = int(
-        (width * ratio * 0.46)
+        (width * ratio * CORRECTION_FACTOR)
     )  # 0.46 is the correction factor for rectangular terminal fonts.
     return img.resize((width, new_height))
 
 
 def format_normalizer(raw, files):
+    """Normalize requested formats (case-insensitive) and validate against generated files.
+
+    - Skips falsy values (None, empty strings).
+    - Trims whitespace and lowercases inputs.
+    - Treats 'jpeg' as 'jpg'.
+    - `files` can be any iterable (dict, set, list); membership checks keys for dicts.
+    """
     normalized = set()
-    for fmt in raw:
+    # collect file-format keys in lowercase for reliable membership checks
+    files_keys = {str(k).lower() for k in files}
+    for item in raw:
+        # ignore non-string values
+        if not isinstance(item, str):
+            continue
+        # normalize case and trim whitespace
+        fmt = item.strip().lower()
         if not fmt:
             continue
         normalized_fmt = "jpg" if fmt == "jpeg" else fmt
-        if normalized_fmt in files:
+        if normalized_fmt in files_keys:
             normalized.add(normalized_fmt)
         elif normalized_fmt in ALL_FORMATS:
             print(

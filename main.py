@@ -1,6 +1,6 @@
-from arg_parser import parse_args
-from processor import process_image_file
-from consts import ALL_FORMATS
+from src.arg_parser import parse_args
+from src.processor import process_image_file
+from src.consts import ALL_FORMATS
 
 
 def main():
@@ -18,5 +18,5 @@ def main():
         print("Text Art display only (no files saved).")
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     main()
